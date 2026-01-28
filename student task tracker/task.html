@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StudyPlan | Tasks & Exams</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-purple: #8B5CF6;
+            --primary-pink: #EC4899;
+            --sidebar-bg: #ffffff;
+            --main-bg: #f8fafc;
+            --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #f0f9f0 0%, #fdf2f8 100%);
+            overflow-x: hidden;
+            color: #334155;
+        }
+
+        /* --- SIDEBAR (Matched to Dashboard) --- */
+        .sidebar {
+            width: 260px;
+            height: 100vh;
+            background: var(--sidebar-bg);
+            box-shadow: var(--card-shadow);
+            position: fixed;
+            left: 0;
+            top: 0;
+            z-index: 1000;
+            transition: transform 0.3s ease;
+        }
+
+        .sidebar-brand {
+            padding: 1.5rem;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .brand-logo {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, var(--primary-purple), var(--primary-pink));
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .sidebar-nav {
+            padding: 1rem 0;
+            flex: 1;
+        }
+
+        .nav-item {
+            margin: 0.25rem 1rem;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            border-radius: 12px;
+            color: #64748b;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            font-weight: 500;
+        }
+
+        .nav-link:hover {
+            background-color: #f1f5f9;
+            color: #334155;
+        }
+
+        .nav-link.active {
+            background-color: #ede9fe;
+            color: var(--primary-purple);
+        }
+
+        .nav-link i {
+            width: 20px;
+            margin-right: 12px;
+        }
+
+        /* --- MAIN CONTENT & HEADER --- */
+        .main-content {
+            margin-left: 260px;
+            min-height: 100vh;
+            transition: margin-left 0.3s ease;
+        }
+
+        .top-header {
+            background: white;
+            box-shadow: var(--card-shadow);
+            padding: 1.5rem 2rem;
+        }
+
+        .search-box {
+            position: relative;
+            max-width: 320px;
+        }
+
+        .search-box input {
+            padding-left: 2.5rem;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+            padding: 0.75rem 1rem;
+        }
+
+        .search-box i {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #94a3b8;
+        }
+
+        .task-container {
+            padding: 2rem;
+        }
+
+        /* --- BENTO CARDS & COMPONENTS --- */
+        .section-title { 
+            font-weight: 700; 
+            color: #1e293b; 
+            margin: 0; 
+            display: flex; 
+            align-items: center; 
+            gap: 10px; 
+        }
+
+        .bento-card {
+            background: white; 
+            border-radius: 20px; 
+            padding: 1.5rem;
+            box-shadow: var(--card-shadow); 
+            height: 100%; 
+            border: none;
+        }
+
+        .add-btn-3d {
+            background: var(--primary-purple); 
+            color: white; 
+            border: none;
+            width: 32px; 
+            height: 32px; 
+            border-radius: 8px;
+            display: flex; 
+            align-items: center; 
+            justify-content: center;
+            transition: 0.3s;
+        }
+        .add-btn-3d:hover { background: var(--primary-pink); transform: scale(1.1); }
+
+        /* To-Do Items */
+        .todo-item {
+            display: flex; align-items: center; padding: 12px; 
+            background: #f8fafc;
+            border-radius: 12px; margin-bottom: 12px; 
+            border-left: 4px solid var(--primary-purple);
+            transition: 0.2s;
+        }
+        .todo-item:hover { transform: translateX(5px); background: #f1f5f9; }
+
+        /* Exam Cards (Kept structure but updated colors) */
+        .exam-card {
+            background: linear-gradient(135deg, var(--primary-purple) 0%, #6366f1 100%);
+            color: white; border-radius: 15px; padding: 15px; margin-bottom: 15px;
+            position: relative;
+            box-shadow: 0 4px 12px rgba(139, 92, 246, 0.2);
+        }
+        .exam-card.dark { background: #1e293b; }
+
+        /* STICKY NOTES (Kept exactly as requested) */
+        .reminder-note {
+            background: #fff9c4; border-radius: 2px; padding: 20px;
+            margin-bottom: 20px; box-shadow: 5px 5px 10px rgba(0,0,0,0.1);
+            transform: rotate(-2deg); transition: 0.3s;
+            border-bottom: 3px solid #fbc02d;
+            position: relative;
+        }
+        .reminder-note.blue { background: #e1f5fe; border-bottom: 3px solid #03a9f4; transform: rotate(2deg); }
+        .reminder-note:hover { transform: rotate(0deg) scale(1.05); z-index: 10; }
+        
+        .pin {
+            width: 12px; height: 12px; background: #e74c3c; border-radius: 50%;
+            position: absolute; top: 5px; left: 50%; transform: translateX(-50%);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .avatar-circle {
+            width: 40px; height: 40px;
+            background: linear-gradient(135deg, var(--primary-purple), var(--primary-pink));
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            color: white; font-weight: bold;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar { transform: translateX(-100%); }
+            .main-content { margin-left: 0; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-brand">
+            <div class="d-flex align-items-center">
+                <div class="brand-logo">SP</div>
+                <span class="fw-bold ms-2 text-dark">StudyPlan</span>
+            </div>
+        </div>
+        
+        <nav class="sidebar-nav">
+            <div class="nav-item">
+                <a href="dashboard.html" class="nav-link">
+                    <i class="fas fa-chart-bar"></i>
+                    Dashboard
+                </a>
+            </div>
+            <div class="nav-item">
+                <a href="class.html" class="nav-link">
+                    <i class="fas fa-users"></i>
+                    My Class
+                </a>
+            </div>
+            <div class="nav-item">
+                <a href="task.html" class="nav-link active">
+                    <i class="fas fa-tasks"></i>
+                    Task                
+                </a>
+            </div>
+            <div class="nav-item">
+                <a href="calendar.html" class="nav-link">
+                    <i class="fas fa-calendar"></i>
+                    Calendar
+                </a>
+            </div>
+             <div class="nav-item">
+                <a href="profile.html" class="nav-link">
+                    <i class="fas fa-user-friends"></i>
+                    Profile
+                </a>
+            </div>
+        </nav>
+        
+        <div class="sidebar-nav border-top pt-3 mt-auto">
+            <div class="nav-item">
+                <a href="index.html" class="nav-link">
+                    <i class="fas fa-sign-out-alt"></i>
+                    Log out
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="main-content">
+        
+        <header class="top-header">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h4 class="fw-bold mb-0">My Study Tasks ✍️</h4>
+                    <p class="text-muted small mb-0">What are we crushing today?</p>
+                </div>
+                
+                <div class="d-flex align-items-center gap-3">
+                    <div class="search-box d-none d-md-block">
+                        <i class="fas fa-search"></i>
+                        <input type="text" class="form-control" placeholder="Search tasks...">
+                    </div>
+                    <div class="d-flex align-items-center gap-2">
+                        <div class="text-end d-none d-sm-block">
+                            <p class="fw-bold mb-0" style="font-size: 0.85rem;">Aisyamera</p>
+                            <p class="text-muted mb-0" style="font-size: 0.7rem;">ID: 2023898542</p>
+                        </div>
+                        <div class="avatar-circle">AI</div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <div class="task-container">
+            <div class="row g-4">
+                
+                <div class="col-lg-5">
+                    <div class="bento-card">
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <h5 class="section-title"><i class="fas fa-check-double" style="color: var(--primary-purple);"></i> To-Do List</h5>
+                            <button class="add-btn-3d"><i class="fas fa-plus"></i></button>
+                        </div>
+                        
+                        <div class="todo-item">
+                            <div class="me-3"><i class="far fa-circle text-muted"></i></div>
+                            <div class="flex-grow-1">
+                                <h6 class="mb-0 fw-bold">Design App Interface</h6>
+                                <small class="text-danger">High Priority</small>
+                            </div>
+                        </div>
+                        <div class="todo-item">
+                            <div class="me-3"><i class="far fa-circle text-muted"></i></div>
+                            <div class="flex-grow-1">
+                                <h6 class="mb-0 fw-bold">Journal Article Hw</h6>
+                                <small class="text-muted">Due 5:00 PM</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-4">
+                    <div class="bento-card">
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <h5 class="section-title"><i class="fas fa-file-alt" style="color: var(--primary-pink);"></i> Exam Tracker</h5>
+                            <button class="add-btn-3d" style="background: var(--primary-pink);"><i class="fas fa-plus"></i></button>
+                        </div>
+                        
+                        <div class="exam-card">
+                            <h6 class="fw-bold mb-1">IMS610 Midterm</h6>
+                            <p class="small mb-0 opacity-75">15 Jan • 4 Days Left</p>
+                        </div>
+                        <div class="exam-card dark">
+                            <h6 class="fw-bold mb-1">SQL Quiz</h6>
+                            <p class="small mb-0 opacity-75">20 Jan • 9 Days Left</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-3">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h5 class="section-title"><i class="fas fa-thumbtack" style="color: #fbc02d;"></i> Reminders</h5>
+                        <button class="add-btn-3d" style="background: #fbc02d;"><i class="fas fa-plus"></i></button>
+                    </div>
+                    
+                    <div class="reminder-note">
+                        <div class="pin"></div>
+                        <h6 class="fw-bold">Group Meeting</h6>
+                        <p class="small mb-0">Discuss Section B with Sarah at 9PM tonight.</p>
+                    </div>
+
+                    <div class="reminder-note blue">
+                        <div class="pin"></div>
+                        <h6 class="fw-bold">Library Return</h6>
+                        <p class="small mb-0">Don't forget to return the Database book by Friday!</p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
