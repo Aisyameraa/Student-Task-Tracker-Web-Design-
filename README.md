@@ -1,0 +1,1 @@
+Smart StudyPlan is a web-based application designed to help university students manage their academic activities efficiently. The system allows users to organize classes, track assignments, manage deadlines, and reflect on their learning progress through a centralized platform.
